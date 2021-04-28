@@ -16,9 +16,9 @@ variable "dynamo_name" {
 
 variable "asset_tags" {
   description = "Default tags"
-  type        = map
-  default     = {
+  type        = map(any)
+  default = {
     Environment = "Production"
-    IaC        = "True"
+    IaC         = "True"
   }
 }
