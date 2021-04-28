@@ -3,10 +3,10 @@ name: Default Workflow
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches-ignore:
-      - master
+      - main
 
 # Notes on what this workflow touches
 # JOB_RUNNER: "ubuntu-latest"
