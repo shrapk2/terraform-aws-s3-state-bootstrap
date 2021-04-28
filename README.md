@@ -1,3 +1,5 @@
+![Validation Status](https://github.com/shrapk2/terraform-aws-s3-state-bootstrap/actions/workflows/default.yml/badge.svg)
+
 # terraform-aws-s3-state-bootstrap
 
 This project contains an "un-automated" bootstrap configuration for starting infrastructure as code. At present it contains the
