@@ -45,20 +45,29 @@ This Terraform configuration creates the following objects:
 
 Upon execution of this code, you should add the following state arguments into any infrastructure Terraform modules:
 
-#TODO: Clean these examples up:
+- In CI or via command line:
 
 ```bash
-export TF_VAR_
+terraform [init|plan|apply] \
+  -backend-config="bucket=$BUCKET_NAME" \ 
+  -backend-config="key=$USER_DEFINED.tfstate"\ 
+  -backend-config="region=$AWS_REGION" \ 
+  -backend-config="dynamodb_table=$DYNAMO_TABLENAME" \ 
+  -backend-config="encrypt=true"
+```
 
--backend-config="
+- In a `backend.tf` file:
 
-
-bucket         = "terraform-aws-s3-state-bootstrap-tfstate"
-key            = "core/terraform.tfstate"
-region         = "us-east-2"
-dynamodb_table = "terraform-aws-s3-state-bootstrap-tfstate-locks"
-encrypt        = true
-
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "terraform-aws-s3-state-bootstrap-tfstate"
+    key            = "terraform.tfstate"
+    region         = "us-east-2"
+    dynamodb_table = "terraform-aws-s3-state-bootstrap-tfstate-locks"
+    encrypt        = true
+  }
+}
 ```
 
 ## License

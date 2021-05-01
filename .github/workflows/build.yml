@@ -45,8 +45,8 @@ jobs:
       image: shrapk2/devops:latest
     env:
       AWS_DEFAULT_REGION: ${{ github.event.inputs.aws_region }}
-      TF_BUCKET_NAME: ${{ github.event.inputs.tf_bucket_name }}
-      TF_DYNAMO_NAME: ${{ github.event.inputs.tf_dynamo_name }}
+      TF_VAR_BUCKET_NAME: ${{ github.event.inputs.tf_bucket_name }}
+      TF_VAR_DYNAMO_NAME: ${{ github.event.inputs.tf_dynamo_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
@@ -62,14 +62,16 @@ jobs:
           echo AWS_SECRET_ACCESS_KEY="$SECRET_KEY" >> $GITHUB_ENV
       - name: Terraform Create State
         run: |
-          echo $AWS_SECRET_ACCESS_KEY
-          echo $AWS_ACCESS_KEY_ID
-          echo $AWS_DEFAULT_REGION
-          echo $TF_BUCKET_NAME
-          echo $TF_DYNAMO_NAME
-          #terraform init
-          #terraform apply
+          terraform init -input=false
+          terraform apply -input=false -auto-approve
+          echo
+          echo "Use this configuration for managing your infrastructure TF state:"
+          echo -e "terraform init \ \n  -backend-config=\"bucket=$TF_VAR_BUCKET_NAME\" \ \n  -backend-config=\"key=user_defined.tfstate\"\ \n  -backend-config=\"region=$AWS_DEFAULT_REGION\" \ \n  -backend-config=\"dynamodb_table=$TF_VAR_DYNAMO_NAME\" \ \n  -backend-config=\"encrypt=true\""
+          echo
+          echo "This is the S3 bucket ARN: $(terraform output 3_bucket_arn)"
+          echo "Reminder, store your IAM credentials in a secure location, they will be used to manage your Infrastructure's TF state in the future!!"
         working-directory: ./
 
-# we don't care about this state, we only care about the output of this state which is a 
-# S3 bucket from which we'll use for the rest of our state
+# Note, we don't care about this particular state, we only care about the output of this state which is a 
+# S3 bucket from which we'll use for the rest of our Terraform-managed infrastructure state
+
