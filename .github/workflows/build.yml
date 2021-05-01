@@ -1,0 +1,75 @@
+name: Terraform Create State
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_access_key:
+        description: 'AWS Account Access Key'
+        required: true
+        default: 'youraccesskey'
+      aws_secret_key:
+        description: 'AWS Secret Key' 
+        required: true
+        default: 'yoursecretkey'
+      aws_region:
+        description: 'AWS Region for S3 State'
+        required: true
+        default: 'us-east-2'
+      tf_bucket_name:
+        description: 'AWS S3 Bucket name for Terraform state.'
+        required: true
+        default: 'terraform-aws-s3-state-bootstrap-tfstate'
+      tf_dynamo_name:
+        description: 'AWS DynamoDB name for managing locks of S3, required by Terraform.'
+        required: true
+        default: 'terraform-aws-s3-state-bootstrap-tfstate-locks'
+
+jobs:
+  TF-Validation:
+    runs-on: ubuntu-latest
+    container:
+      image: shrapk2/devops:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Terraform Validation - Infrastructure
+        run: |
+          terraform fmt -check
+          terraform init -backend=false
+          terraform validate
+        working-directory: ./
+
+  TF-Create-State:
+    runs-on: ubuntu-latest
+    container:
+      image: shrapk2/devops:latest
+    env:
+      AWS_DEFAULT_REGION: ${{ github.event.inputs.aws_region }}
+      TF_BUCKET_NAME: ${{ github.event.inputs.tf_bucket_name }}
+      TF_DYNAMO_NAME: ${{ github.event.inputs.tf_dynamo_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Mask Inputs
+        run: |
+          ACCESS_KEY=$(jq -r '.inputs.aws_access_key' $GITHUB_EVENT_PATH) 
+          SECRET_KEY=$(jq -r '.inputs.aws_secret_key' $GITHUB_EVENT_PATH)
+          echo ::add-mask::$ACCESS_KEY
+          echo ::add-mask::$SECRET_KEY
+          echo ::set-output name=aws_access_key_id::$ACCESS_KEY
+          echo ::set-output name=aws_secret_access_key::$SECRET_KEY
+          echo AWS_ACCESS_KEY_ID="$ACCESS_KEY" >> $GITHUB_ENV
+          echo AWS_SECRET_ACCESS_KEY="$SECRET_KEY" >> $GITHUB_ENV
+      - name: Terraform Create State
+        run: |
+          echo $AWS_SECRET_ACCESS_KEY
+          echo $AWS_ACCESS_KEY_ID
+          echo $AWS_DEFAULT_REGION
+          echo $TF_BUCKET_NAME
+          echo $TF_DYNAMO_NAME
+          #terraform init
+          #terraform apply
+        working-directory: ./
+
+# we don't care about this state, we only care about the output of this state which is a 
+# S3 bucket from which we'll use for the rest of our state
