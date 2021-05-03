@@ -86,6 +86,13 @@ resource "time_sleep" "s3_sleeper_2" {
   }
 }
 
+resource "time_sleep" "s3_sleeper_3" {
+  create_duration = "45s"
+  triggers = {
+    s3_policy2 = aws_s3_bucket_policy.bucket_policy.id
+  }
+}
+
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.terraform_state.id
 
