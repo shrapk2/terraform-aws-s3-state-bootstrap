@@ -4,25 +4,29 @@ on:
   workflow_dispatch:
     inputs:
       aws_access_key:
-        description: 'AWS Account Access Key'
+        description: "AWS Account Access Key"
         required: true
-        default: 'youraccesskey'
+        default: "youraccesskey"
       aws_secret_key:
-        description: 'AWS Secret Key' 
+        description: "AWS Secret Key"
         required: true
-        default: 'yoursecretkey'
+        default: "yoursecretkey"
       aws_region:
-        description: 'AWS Region for S3 State'
+        description: "AWS Region for S3 State"
         required: true
-        default: 'us-east-2'
+        default: "us-east-2"
       tf_bucket_name:
-        description: 'AWS S3 Bucket name for Terraform state.'
+        description: "AWS S3 Bucket name for Terraform state."
         required: true
-        default: 'terraform-aws-s3-state-bootstrap-tfstate'
+        default: "terraform-aws-s3-state-bootstrap-tfstate"
       tf_dynamo_name:
-        description: 'AWS DynamoDB name for managing locks of S3, required by Terraform.'
+        description: "AWS DynamoDB name for managing locks of S3, required by Terraform."
         required: true
-        default: 'terraform-aws-s3-state-bootstrap-tfstate-locks'
+        default: "terraform-aws-s3-state-bootstrap-tfstate-locks"
+      tf_bucket_role:
+        description: "AWS IAM Role for this S3 Bucket."
+        required: true
+        default: "TF-Admins"
 
 jobs:
   TF-Validation:
@@ -47,12 +51,14 @@ jobs:
       AWS_DEFAULT_REGION: ${{ github.event.inputs.aws_region }}
       TF_VAR_BUCKET_NAME: ${{ github.event.inputs.tf_bucket_name }}
       TF_VAR_DYNAMO_NAME: ${{ github.event.inputs.tf_dynamo_name }}
+      TF_VAR_TF_ROLE_NAME: ${{ github.event.inputs.tf_bucket_role }}
+      TF_VAR_REGION: ${{ github.event.inputs.aws_region }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
       - name: Mask Inputs
         run: |
-          ACCESS_KEY=$(jq -r '.inputs.aws_access_key' $GITHUB_EVENT_PATH) 
+          ACCESS_KEY=$(jq -r '.inputs.aws_access_key' $GITHUB_EVENT_PATH)
           SECRET_KEY=$(jq -r '.inputs.aws_secret_key' $GITHUB_EVENT_PATH)
           echo ::add-mask::$ACCESS_KEY
           echo ::add-mask::$SECRET_KEY
@@ -71,7 +77,5 @@ jobs:
           echo "This is the S3 bucket ARN: $(terraform output 3_bucket_arn)"
           echo "Reminder, store your IAM credentials in a secure location, they will be used to manage your Infrastructure's TF state in the future!!"
         working-directory: ./
-
-# Note, we don't care about this particular state, we only care about the output of this state which is a 
+# Note, we don't care about this particular state, we only care about the output of this state which is a
 # S3 bucket from which we'll use for the rest of our Terraform-managed infrastructure state
-

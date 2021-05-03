@@ -56,7 +56,7 @@ resource "aws_s3_bucket_public_access_block" "terraform_s3" {
 }
 
 resource "aws_s3_bucket_object" "s3_key" {
-  key                    = "core/terraform.tfstate"
+  key                    = "terraform.tfstate"
   bucket                 = aws_s3_bucket.terraform_state.id
   server_side_encryption = "AES256"
 }
@@ -97,7 +97,7 @@ POLICY
 }
 
 resource "aws_iam_role" "role_tf_admins" {
-  name = "TerraformAdmins"
+  name = var.tf_role_name
 
   assume_role_policy = <<EOF
 {

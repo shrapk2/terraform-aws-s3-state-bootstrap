@@ -14,6 +14,12 @@ variable "dynamo_name" {
   type        = string
 }
 
+variable "tf_role_name" {
+  description = "Terraform S3 Role Policy for this bucket"
+  type        = string
+  default     = "TF-Admins"
+}
+
 variable "asset_tags" {
   description = "Default tags"
   type        = map(any)

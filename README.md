@@ -9,6 +9,8 @@ Along with prevent sensitive state data from residing within Git, it also allows
 
 As a best practice, this Terraform state should remain disconnected from the overall infrastructure state, so this module should be executed once per account and not imported into the primary infrastructure state.
 
+> Note: You can also fork this and run via GitHub Actions!!
+
 ## Prerequisites
 
 This code assumes the following:
