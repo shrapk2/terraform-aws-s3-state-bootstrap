@@ -73,14 +73,14 @@ resource "aws_dynamodb_table" "terraform_locks" {
 }
 
 resource "time_sleep" "s3_sleeper_1" {
-  create_duration = "45s"
+  create_duration = "30s"
   triggers = {
     s3_policy = aws_s3_bucket_public_access_block.terraform_s3.id
   }
 }
 
 resource "time_sleep" "s3_sleeper_2" {
-  create_duration = "45s"
+  create_duration = "30s"
   triggers = {
     s3_key = aws_s3_bucket_object.s3_key.id
   }
