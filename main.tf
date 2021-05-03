@@ -72,6 +72,12 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
+resource "time_sleep" "wait_45_seconds" {
+  depends_on = [aws_s3_bucket_public_access_block.terraform_s3]
+
+  create_duration = "45s"
+}
+
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.terraform_state.id
 
