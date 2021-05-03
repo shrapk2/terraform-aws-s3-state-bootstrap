@@ -59,6 +59,9 @@ resource "aws_s3_bucket_object" "s3_key" {
   key                    = "terraform.tfstate"
   bucket                 = aws_s3_bucket.terraform_state.id
   server_side_encryption = "AES256"
+  depends_on = [
+    time_sleep.s3_sleeper_1
+  ]
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
@@ -86,16 +89,11 @@ resource "time_sleep" "s3_sleeper_2" {
   }
 }
 
-resource "time_sleep" "s3_sleeper_3" {
-  create_duration = "45s"
-  triggers = {
-    s3_policy2 = aws_s3_bucket_policy.bucket_policy.id
-  }
-}
-
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.terraform_state.id
-
+  depends_on = [
+    time_sleep.s3_sleeper_2
+  ]
   policy = <<POLICY
 {
   "Id": "TerraformProtectionPolicy",
