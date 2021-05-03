@@ -49,10 +49,10 @@ jobs:
       image: shrapk2/devops:latest
     env:
       AWS_DEFAULT_REGION: ${{ github.event.inputs.aws_region }}
-      TF_VAR_BUCKET_NAME: ${{ github.event.inputs.tf_bucket_name }}
-      TF_VAR_DYNAMO_NAME: ${{ github.event.inputs.tf_dynamo_name }}
-      TF_VAR_TF_ROLE_NAME: ${{ github.event.inputs.tf_bucket_role }}
-      TF_VAR_REGION: ${{ github.event.inputs.aws_region }}
+      TF_VAR_bucket_name: ${{ github.event.inputs.tf_bucket_name }}
+      TF_VAR_dynamo_name: ${{ github.event.inputs.tf_dynamo_name }}
+      TF_VAR_tf_role_name: ${{ github.event.inputs.tf_bucket_role }}
+      TF_VAR_region: ${{ github.event.inputs.aws_region }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
